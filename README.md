@@ -1,108 +1,98 @@
-# CarND-Controls-MPC
-Self-Driving Car Engineer Nanodegree Program
+# Model Predictive Control for the Udacity Simulator
 
----
-
-## Dependencies
-
-* cmake >= 3.5
- * All OSes: [click here for installation instructions](https://cmake.org/install/)
-* make >= 4.1(mac, linux), 3.81(Windows)
-  * Linux: make is installed by default on most Linux distros
-  * Mac: [install Xcode command line tools to get make](https://developer.apple.com/xcode/features/)
-  * Windows: [Click here for installation instructions](http://gnuwin32.sourceforge.net/packages/make.htm)
-* gcc/g++ >= 5.4
-  * Linux: gcc / g++ is installed by default on most Linux distros
-  * Mac: same deal as make - [install Xcode command line tools]((https://developer.apple.com/xcode/features/)
-  * Windows: recommend using [MinGW](http://www.mingw.org/)
-* [uWebSockets](https://github.com/uWebSockets/uWebSockets)
-  * Run either `install-mac.sh` or `install-ubuntu.sh`.
-  * If you install from source, checkout to commit `e94b6e1`, i.e.
-    ```
-    git clone https://github.com/uWebSockets/uWebSockets
-    cd uWebSockets
-    git checkout e94b6e1
-    ```
-    Some function signatures have changed in v0.14.x. See [this PR](https://github.com/udacity/CarND-MPC-Project/pull/3) for more details.
-
-* **Ipopt and CppAD:** Please refer to [this document](https://github.com/udacity/CarND-MPC-Project/blob/master/install_Ipopt_CppAD.md) for installation instructions.
-* [Eigen](http://eigen.tuxfamily.org/index.php?title=Main_Page). This is already part of the repo so you shouldn't have to worry about it.
-* Simulator. You can download these from the [releases tab](https://github.com/udacity/self-driving-car-sim/releases).
-* Not a dependency but read the [DATA.md](./DATA.md) for a description of the data sent back from the simulator.
+The project consist of the c++ implementation of the car to predict the steering angle and the throttle values for the Udacity simulator.The project uses MPC controller to optimise the actutors to be used in the car for particular time period.The actuators are steering angle and the throttle.
 
 
-## Basic Build Instructions
+## 1.Files
 
-1. Clone this repo.
-2. Make a build directory: `mkdir build && cd build`
-3. Compile: `cmake .. && make`
-4. Run it: `./mpc`.
+Thr following files depict the work to be done:
+* MPC.cpp:   MPC controller class definition;
+* main.cpp:  main file that integrates the MPC controller with the simulator.
 
-## Tips
+## 2 Dependency
 
-1. It's recommended to test the MPC on basic examples to see if your implementation behaves as desired. One possible example
-is the vehicle starting offset of a straight line (reference). If the MPC implementation is correct, after some number of timesteps
-(not too many) it should find and track the reference line.
-2. The `lake_track_waypoints.csv` file has the waypoints of the lake track. You could use this to fit polynomials and points and see of how well your model tracks curve. NOTE: This file might be not completely in sync with the simulator so your solution should NOT depend on it.
-3. For visualization this C++ [matplotlib wrapper](https://github.com/lava/matplotlib-cpp) could be helpful.)
-4.  Tips for setting up your environment are available [here](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/23d376c7-0195-4276-bdf0-e02f1f3c665d)
-5. **VM Latency:** Some students have reported differences in behavior using VM's ostensibly a result of latency.  Please let us know if issues arise as a result of a VM environment.
+This project requires the following packages to work:
+* Udacity Simulator [https://github.com/udacity/self-driving-car-sim/releases/](https://github.com/udacity/self-driving-car-sim/releases/);
+* cmake 3.5 or above;
+* make 4.1 or above;
+* gcc/g++: 5.4 or above;
+* uWebSocketIO;
+* ipopt;
+* CppAd.
 
-## Editor Settings
+## 3.1 Compiling and Running
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+The main program can be built and run by doing the following from the project top directory.
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
+1. mkdir build
+2. cd build
+3. cmake ..
+4. make
+5. ./pid
+6. Run the Udacity Simulator (./term2_simulator)
 
-## Code Style
+## 4.Model Predictive Control
 
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
+The MPC is an advanced control algorithm to solve the control problems and get the optimsed control outputs.The MPC solves an optimisation problem by minimizing the cost function based on the prediction algorithm or the control model.The cost function in our case is the total sum of cross-track error and the heading error over a particular set of horizons.The predcition algorithm is the bicycle model in that case.
 
-## Project Instructions and Rubric
+### 4.1 Prediction Horizon
 
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
+The prediction horizon is the timesteps over which the predictions are made.The timstep in our case is depicted by the the variable "N" as the number of timesteps which also depict the number of timesteps to be used.The variable dt is the time to be taken between each timestep.
 
-More information is only accessible by people who are already enrolled in Term 2
-of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/f1820894-8322-4bb3-81aa-b26b3c6dcbaf/lessons/b1ff3be0-c904-438e-aad3-2b5379f0e0c3/concepts/1a2255a0-e23c-44cf-8d41-39b8a3c8264a)
-for instructions and the project rubric.
+Higher N will also result in more complexity and higher dt will lead to imperfect approximation. In case ,when vehicle has higher speeds ,the product of N and dt should be low as the car has less time to fix up the errors .Therefore the predictions should be made on less durations. 
 
-## Hints!
+To tweak N and dt ,we have used trial and error by driving the car on the simulator for particular values of N and dt.
+The N is 12 and the dt is fixed to 0.03 second.
 
-* You don't have to follow this directory structure, but if you do, your work
-  will span all of the .cpp files here. Keep an eye out for TODOs.
+### 4.2 State
 
-## Call for IDE Profiles Pull Requests
+The state consist of the vector ``['x','y','psi','c','cte','epsi']``.The x ad y here are the coordinates of the car ,psi is the heading and v the velocity.The cte is the cross track error and the epsi is the orientation error. There are also the actuator inputs which consist of two elements that is throttle and steering abgle.
 
-Help your fellow students!
+### 4.3 Model (Update equations)
 
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to we ensure
-that students don't feel pressured to use one IDE or another.
 
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
+![equation](http://latex.codecogs.com/gif.latex?x_%28t&plus;1%29%20%3D%20x_t%20&plus;%20v_t%20*%20cos%28%5Cpsi_t%29*dt)
 
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
+![equation](http://latex.codecogs.com/gif.latex?y_%28t&plus;1%29%20%3D%20y_t%20&plus;%20v_t%20*%20sin%28%5Cpsi_t%29*dt)
 
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
+![equation](http://latex.codecogs.com/gif.latex?%5Cpsi%20_%28t&plus;1%29%20%3D%20%5Cpsi%20_t%20&plus;%20%5Cfrac%7Bv_t%7D%7BL_f%7D*%20%5Cdelta_t%20*%20dt)
 
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
+![equation](http://latex.codecogs.com/gif.latex?v_%28t&plus;1%29%20%3D%20v%20_t%20&plus;%20a_t%20*%20dt)
 
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
+![equation](http://latex.codecogs.com/gif.latex?cte_%28t&plus;1%29%20%3D%20f%28x_t%29%20-%20y_t%20&plus;%20v%20_t%20*%20sin%28e%5Cpsi%20_t%29%20*%20dt)
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+![equation](http://latex.codecogs.com/gif.latex?e%5Cpsi%20_%28t&plus;1%29%20%3D%20%5Cpsi%20_t%20-%20%5Cpsi%20dest%20&plus;%20%5Cfrac%7Bv_f%7D%7BL_f%7D%20*%20%5Cdelta_t%20*%20dt)
+
+
+
+### 4.4 Coordinate Transform
+
+The whole coordinate system is rotated by the angle psi to make the orientation and the position of the car the origin so that further work could be transformed to the car coordinates to simplify the further work.I have provided the code below: 
+
+```c
+	for(unsigned int i = 0; i < ptsx.size(); i++)
+          {
+            double shift_x = ptsx[i] - px;
+            double shift_y = ptsy[i] - py;
+
+            ptsx[i] = shift_x * cos(0 - psi) - shift_y * sin(0 - psi);
+            ptsy[i] = shift_x * sin(0 - psi) + shift_y * cos(0 - psi);
+          }
+          ```
+
+``Lf`` is the distance between the cars front and the COM of the car.
+### 4.5 Latency
+
+We take into account the latency i.e. the time taken by actuators to reflect the real throttle and the steering angle.
+```c
+dt = 0.1;
+x1    = v * cos(0) * dt;
+y1    = v * sin(0) * dt;
+psi1  = - v/Lf * steer_value * dt;
+v1    = throttle_value * dt;
+cte1  =   v * sin(epsi1) * dt;
+epsi1 = - v * steer_value / Lf * dt;
+```
+
+The project successfully implements the MPC control algorithm to precict the actuator inputs such as steering and the throttle to drive the car in the simulator.The car drives at a moderate speed close to 40 kmph. Improvements can be made in the whole system by carefully tuning the horizon and the timestep .However the latency should be the first thing to be taken care of as it leads to massive cross track error and orientation error.
+
