@@ -12,8 +12,8 @@ using CppAD::AD;
 // period to 0.05.
 size_t N = 12;
 double dt = 0.03;
-double latency = 0.1;
-double dt_with_latency = dt+latency;
+// double latency = 0.1;
+// double dt = dt+latency;
 
 // This value assumes the model presented in the classroom is used.
 //
@@ -133,14 +133,14 @@ class FG_eval {
       // v_[t+1] = v[t] + a[t] * dt
       // cte[t+1] = f(x[t]) - y[t] + v[t] * sin(epsi[t]) * dt
       // epsi[t+1] = psi[t] - psides[t] + v[t] * delta[t] / Lf * dt
-      fg[1 + x_start + t] = x1 - (x0 + v0 * CppAD::cos(psi0) * dt_with_latency);
-      fg[1 + y_start + t] = y1 - (y0 + v0 * CppAD::sin(psi0) * dt_with_latency);
-      fg[1 + psi_start + t] = psi1 - (psi0 - v0 * delta0 / Lf * dt_with_latency);
-      fg[1 + v_start + t] = v1 - (v0 + a0 * dt_with_latency);
+      fg[1 + x_start + t] = x1 - (x0 + v0 * CppAD::cos(psi0) * dt);
+      fg[1 + y_start + t] = y1 - (y0 + v0 * CppAD::sin(psi0) * dt);
+      fg[1 + psi_start + t] = psi1 - (psi0 - v0 * delta0 / Lf );
+      fg[1 + v_start + t] = v1 - (v0 + a0 * dt);
       fg[1 + cte_start + t] =
-          cte1 - ((f0 - y0) + (v0 * CppAD::sin(epsi0) * dt_with_latency));
+          cte1 - ((f0 - y0) + (v0 * CppAD::sin(epsi0) * dt));
       fg[1 + epsi_start + t] =
-          epsi1 - ((psi0 - psides0) + v0 * delta0 / Lf * dt_with_latency);
+          epsi1 - ((psi0 - psides0) + v0 * delta0 / Lf * dt);
     }
   }
 };
