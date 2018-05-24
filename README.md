@@ -69,18 +69,18 @@ The state consist of the vector ``['x','y','psi','c','cte','epsi']``.The x ad y 
 
 The whole coordinate system is rotated by the angle psi to make the orientation and the position of the car the origin so that further work could be transformed to the car coordinates to simplify the further work.I have provided the code below: 
 
-```c
+	``
 	for(unsigned int i = 0; i < ptsx.size(); i++)
           {
             double shift_x = ptsx[i] - px;
             double shift_y = ptsy[i] - py;
-
             ptsx[i] = shift_x * cos(0 - psi) - shift_y * sin(0 - psi);
             ptsy[i] = shift_x * sin(0 - psi) + shift_y * cos(0 - psi);
           }
-          ```
+          ``
 
 ``Lf`` is the distance between the cars front and the COM of the car.
+
 ### 4.5 Latency
 
 We take into account the latency i.e. the time taken by actuators to reflect the real throttle and the steering angle.
@@ -95,4 +95,5 @@ epsi1 = - v * steer_value / Lf * dt;
 ```
 
 The project successfully implements the MPC control algorithm to precict the actuator inputs such as steering and the throttle to drive the car in the simulator.The car drives at a moderate speed close to 40 kmph. Improvements can be made in the whole system by carefully tuning the horizon and the timestep .However the latency should be the first thing to be taken care of as it leads to massive cross track error and orientation error.
+
 
