@@ -10,8 +10,8 @@ using CppAD::AD;
 // We set the number of timesteps to 25
 // and the timestep evaluation frequency or evaluation
 // period to 0.05.
-size_t N = 12;
-double dt = 0.03;
+size_t N = 10;
+double dt = 0.1;
 // double latency = 0.1;
 // double dt = dt+latency;
 
@@ -59,21 +59,21 @@ class FG_eval {
 
     // The part of the cost based on the reference state.
     for (int t = 0; t < N; t++) {
-      fg[0] += 2000*(t+1)*CppAD::pow(vars[cte_start + t], 2);
-      fg[0] += 2000*(t+1)*CppAD::pow(vars[epsi_start + t], 2);
+      fg[0] += 35000*CppAD::pow(vars[cte_start + t], 2);
+      fg[0] += 15000*CppAD::pow(vars[epsi_start + t], 2);
       fg[0] += CppAD::pow(vars[v_start + t] - ref_v, 2);
     }
 
     // Minimize the use of actuators.
     for (int t = 0; t < N - 1; t++) {
-      fg[0] += 500*(t+1)*CppAD::pow(vars[delta_start + t], 2);
-      fg[0] += 50*(t+1)*CppAD::pow(vars[a_start + t], 2);
+      fg[0] += 40000*CppAD::pow(vars[delta_start + t], 2);
+      fg[0] += 20*CppAD::pow(vars[a_start + t], 2);
     }
 
     // Minimize the value gap between sequential actuations.
     for (int t = 0; t < N - 2; t++) {
-      fg[0] += 1000*(t+1)*CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
-      fg[0] += 1000*(t+1)*CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
+      fg[0] += 15000*CppAD::pow(vars[delta_start + t + 1] - vars[delta_start + t], 2);
+      fg[0] += 5000*CppAD::pow(vars[a_start + t + 1] - vars[a_start + t], 2);
     }
 
     //
@@ -154,7 +154,7 @@ MPC::~MPC() {}
 
 vector<double> MPC::Solve(Eigen::VectorXd x0, Eigen::VectorXd coeffs) {
   bool ok = true;
-  size_t i;
+  // size_t i;
   typedef CPPAD_TESTVECTOR(double) Dvector;
 
   double x = x0[0];
